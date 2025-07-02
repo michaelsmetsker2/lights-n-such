@@ -1,27 +1,25 @@
 const express = require('express');
 const cors = require('cors');
 
-const app = express();
-const listenPort = 3000; //port to listen on
-
 const net = require('net');
+
+const app = express();
+const LISTEN_PORT = 3000; //port to listen on
 
 const HOST = '127.0.0.1';
 const PORT = 6742;
 
-const protocolPacketId = 40     // packet id to request protocol handshake
-const LEDPacketId = 1052        // packet id to update a single led
+const HANDSHAKE_PACKET = Buffer.from('4f52474200000000280000000400000005000000', 'hex'); //protocol handshake packet
+const LED_PACKET_ID = 1052        // packet id to update a single led
 
-const keys = []; // Unpacketed keydata received from website
-
-const delay = (ms) => new Promise(res => setTimeout(res, ms));
+const KEYS = []; // Unpacketed keydata received from website
 
 //builds update_single_led packet to be sent over tcp
 const buildKeyPacket = (ledIndex, { r, g, b}) => {
     const buf = Buffer.alloc(24);
     Buffer.from('ORGB').copy(buf, 0);
     buf.writeUint32LE(0, 4);
-    buf.writeUInt32LE(LEDPacketId, 8);   // update single LED code
+    buf.writeUInt32LE(LED_PACKET_ID, 8);   // update single LED code
     buf.writeUInt32LE(8, 12);            // payload length
     buf.writeUInt32LE(ledIndex, 16);     // order of the key 
     buf.writeUInt8(r, 20);
@@ -31,15 +29,15 @@ const buildKeyPacket = (ledIndex, { r, g, b}) => {
     return buf;
 }
 
+//sends built packets to openrgb server
 const sendAllPackets = async () => {
-    while (keys.length > 0) {
-        const packet = keys.shift();
+    while (KEYS.length > 0) {
+        const packet = KEYS.shift();
         client.write(packet);
-
-        await delay(1); // unsure if needed
+        
     }
 
-    keys.length = 0; //remove all packets
+    KEYS.length = 0; //remove all packets
 };
 
 //socket for sending data to openRGB
@@ -47,21 +45,17 @@ const client = new net.Socket();
 
 client.connect(PORT, HOST, () => {
 
-    //build the handshake protocol packet
-    const protocol = Buffer.alloc(20);
-    Buffer.from('ORGB').copy(protocol, 0);   // magic number
-    protocol.writeUInt32LE(0, 4);            // device index 0
-    protocol.writeUInt32LE(protocolPacketId, 8);           // NET_PACKET_ID_REQUEST_PROTOCOL_VERSION
-    protocol.writeUInt32LE(4, 12);           // payload length
-    protocol.writeUInt32LE(5, 16);           // max supported protocol version
-
-    console.log(protocol.toString('hex')) //make sure the protocol matches
-    client.write(protocol); // now send it
+    client.write(HANDSHAKE_PACKET); // now send it
 });
 
 //only response it should get is during the handshake
 client.on('data', (data) => {
-    console.log(data.toString('hex'));
+
+    if(data.equals(HANDSHAKE_PACKET)) {
+        console.log("openRGB Handshake established successfully");
+    } else {
+        console.error("Protocol handshake failed or protocol version mismatch");
+    }
 });
 
 client.on('error', (err) => {
@@ -82,7 +76,7 @@ app.post('/api/colors', (req, res) => {
     let i = 1;
     colors.forEach(({ keyId, red, green, blue }) => {
         const packet = buildKeyPacket(keyId, { r: red, g: green, b: blue });
-        keys.push(packet);
+        KEYS.push(packet);
     });
 
     //send the completed list of packets to the backend
@@ -91,6 +85,6 @@ app.post('/api/colors', (req, res) => {
     res.sendStatus(200);
 });
 
-app.listen(listenPort, () => {
-    console.log(`listening on http://localhost:${listenPort}`);
+app.listen(LISTEN_PORT, () => {
+    console.log(`listening on http://localhost:${LISTEN_PORT}`);
 });

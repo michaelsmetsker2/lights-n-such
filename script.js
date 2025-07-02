@@ -4,8 +4,7 @@ const guide = document.getElementById('keymap');
 const canvas = document.getElementById("drawingCanvas");
 const ctx = canvas.getContext("2d");
 
-//i should probably not have this like it is, dear god
-const keyLayout = [
+const keyLayout = [ //ledInex, x, y, width, height
     [0, 0, 0, 50, 45], // esc
     [1, 95, 0, 44, 45], // f keys
     [2, 140, 0, 44, 45],
@@ -168,7 +167,7 @@ function submitColors() {
     keyLayout.forEach(([ keyId, x, y, width, height]) => {
         //get image data for the area
         const imgData = ctx.getImageData(x, y, width, height);
-        const data = imgData.data;
+        const data = imgData.data; // r g b a r g b a etc
 
         let rSum = 0, gSum = 0, bSum = 0, count = 0;
 

@@ -1,133 +1,132 @@
-const canvas = document.getElementById("drawingCanvas");
-const ctx = canvas.getContext("2d");
 const colorPicker = document.getElementById("colorPicker");
 const sizeSlider = document.getElementById("sizeSlider");
 const guide = document.getElementById('keymap');
+const canvas = document.getElementById("drawingCanvas");
+const ctx = canvas.getContext("2d");
 
 //i should probably not have this like it is, dear god
 const keyLayout = [
-    { keyId: 0, x: 0, y: 0, width: 50, height: 45}, // esc
-    { keyId: 1, x: 95, y: 0, width: 44, height: 45}, // f keys
-    { keyId: 2, x: 140, y: 0, width: 44, height: 45},
-    { keyId: 3, x: 185, y: 0, width: 44, height: 45},
-    { keyId: 4, x: 230, y: 0, width: 44, height: 45},
-    { keyId: 5, x: 295, y: 0, width: 44, height: 45},
-    { keyId: 6, x: 340, y: 0, width: 44, height: 45},
-    { keyId: 7, x: 385, y: 0, width: 44, height: 45},
-    { keyId: 8, x: 430, y: 0, width: 44, height: 45},
-    { keyId: 9, x: 495, y: 0, width: 44, height: 45},
-    { keyId: 10, x: 540, y: 0, width: 44, height: 45},
-    { keyId: 11, x: 585, y: 0, width: 44, height: 45},
-    { keyId: 12, x: 630, y: 0, width: 44, height: 45},
+    [0, 0, 0, 50, 45], // esc
+    [1, 95, 0, 44, 45], // f keys
+    [2, 140, 0, 44, 45],
+    [3, 185, 0, 44, 45],
+    [4, 230, 0, 44, 45],
+    [5, 295, 0, 44, 45],
+    [6, 340, 0, 44, 45],
+    [7, 385, 0, 44, 45],
+    [8, 430, 0, 44, 45],
+    [9, 495, 0, 44, 45],
+    [10, 540, 0, 44, 45],
+    [11, 585, 0, 44, 45],
+    [12, 630, 0, 44, 45],
 
-    { keyId: 14, x: 685, y: 0, width: 44, height: 45}, // PrntScreen
-    { keyId: 15, x: 730, y: 0, width: 44, height: 45}, // Scrlk
-    { keyId: 16, x: 775, y: 0, width: 44, height: 45}, // Pause
+    [14, 685, 0, 44, 45], // PrntScreen
+    [15, 730, 0, 44, 45], // Scrlk
+    [16, 775, 0, 44, 45], // Pause
 
-    { keyId: 21, x: 0, y: 46, width: 49, height: 49}, // tilde
-    { keyId: 22, x: 50, y: 46, width: 44, height: 49}, // numbers
-    { keyId: 23, x: 95, y: 46, width: 44, height: 49}, 
-    { keyId: 24, x: 140, y: 46, width: 44, height: 49}, 
-    { keyId: 25, x: 185, y: 46, width: 44, height: 49}, 
-    { keyId: 26, x: 230, y: 46, width: 44, height: 49}, 
-    { keyId: 27, x: 275, y: 46, width: 39, height: 49}, 
-    { keyId: 28, x: 315, y: 46, width: 44, height: 49}, 
-    { keyId: 29, x: 360, y: 46, width: 44, height: 49}, 
-    { keyId: 30, x: 405, y: 46, width: 44, height: 49}, 
-    { keyId: 31, x: 450, y: 46, width: 44, height: 49}, 
-    { keyId: 32, x: 495, y: 46, width: 44, height: 49}, 
-    { keyId: 33, x: 540, y: 46, width: 44, height: 49}, 
-    { keyId: 34, x: 585, y: 46, width: 89, height: 49}, // backspace 
+    [21, 0, 46, 49, 49], // tilde
+    [22, 50, 46, 44, 49], // numbers
+    [23, 95, 46, 44, 49], 
+    [24, 140, 46, 44, 49], 
+    [25, 185, 46, 44, 49], 
+    [26, 230, 46, 44, 49], 
+    [27, 275, 46, 39, 49], 
+    [28, 315, 46, 44, 49], 
+    [29, 360, 46, 44, 49], 
+    [30, 405, 46, 44, 49], 
+    [31, 450, 46, 44, 49], 
+    [32, 495, 46, 44, 49], 
+    [33, 540, 46, 44, 49], 
+    [34, 585, 46, 89, 49], // backspace 
 
-    { keyId: 35, x: 685, y: 46, width: 44, height: 49}, // Ins
-    { keyId: 36, x: 730, y: 46, width: 44, height: 49}, // Home
-    { keyId: 37, x: 775, y: 46, width: 44, height: 49}, // PgUp
+    [35, 685, 46, 44, 49], // Ins
+    [36, 730, 46, 44, 49], // Home
+    [37, 775, 46, 44, 49], // PgUp
 
-    { keyId: 38, x: 830, y: 46, width: 44, height: 49}, // Numlk
-    { keyId: 39, x: 875, y: 46, width: 44, height: 49}, // /
-    { keyId: 40, x: 920, y: 46, width: 44, height: 49}, // *
-    { keyId: 41, x: 965, y: 46, width: 44, height: 49}, // -
+    [38, 830, 46, 44, 49], // Numlk
+    [39, 875, 46, 44, 49], // /
+    [40, 920, 46, 44, 49], // *
+    [41, 965, 46, 44, 49], // -
 
-    { keyId: 42, x: 0, y: 95, width: 74, height: 44}, // tab
-    { keyId: 43, x: 75, y: 95, width: 44, height: 44},
-    { keyId: 44, x: 120, y: 95, width: 44, height: 44},
-    { keyId: 45, x: 165, y: 95, width: 39, height: 44},
-    { keyId: 46, x: 205, y: 95, width: 44, height: 44},
-    { keyId: 47, x: 250, y: 95, width: 44, height: 44},
-    { keyId: 48, x: 295, y: 95, width: 44, height: 44},
-    { keyId: 49, x: 340, y: 95, width: 44, height: 44},
-    { keyId: 50, x: 385, y: 95, width: 44, height: 44},
-    { keyId: 51, x: 430, y: 95, width: 44, height: 44},
-    { keyId: 52, x: 475, y: 95, width: 44, height: 44},
-    { keyId: 53, x: 520, y: 95, width: 44, height: 44}, // [
-    { keyId: 54, x: 565, y: 95, width: 44, height: 44}, // ]
-    { keyId: 55, x: 610, y: 95, width: 64, height: 44}, // \
+    [42, 0, 95, 74, 44], // tab
+    [43, 75, 95, 44, 44],
+    [44, 120, 95, 44, 44],
+    [45, 165, 95, 39, 44],
+    [46, 205, 95, 44, 44],
+    [47, 250, 95, 44, 44],
+    [48, 295, 95, 44, 44],
+    [49, 340, 95, 44, 44],
+    [50, 385, 95, 44, 44],
+    [51, 430, 95, 44, 44],
+    [52, 475, 95, 44, 44],
+    [53, 520, 95, 44, 44], // [
+    [54, 565, 95, 44, 44], // ]
+    [55, 610, 95, 64, 44], // \
 
-    { keyId: 56, x: 685, y: 95, width: 44, height: 44}, // Del
-    { keyId: 57, x: 730, y: 95, width: 44, height: 44}, // End
-    { keyId: 58, x: 775, y: 95, width: 44, height: 44}, // PgDn
+    [56, 685, 95, 44, 44], // Del
+    [57, 730, 95, 44, 44], // End
+    [58, 775, 95, 44, 44], // PgDn
 
-    { keyId: 59, x: 830, y: 95, width: 44, height: 44}, // 7
-    { keyId: 60, x: 875, y: 95, width: 44, height: 44}, // 8
-    { keyId: 61, x: 920, y: 95, width: 44, height: 44}, // 9
+    [59, 830, 95, 44, 44], // 7
+    [60, 875, 95, 44, 44], // 8
+    [61, 920, 95, 44, 44], // 9
 
-    { keyId: 62, x: 965, y: 95, width: 44, height: 89}, // numpd+
+    [62, 965, 95, 44, 89], // numpd+
 
-    { keyId: 63, x: 0, y: 140, width: 84, height: 44}, // capslock
-    { keyId: 64, x: 85, y: 140, width: 44, height: 44}, 
-    { keyId: 65, x: 130, y: 140, width: 44, height: 44}, 
-    { keyId: 66, x: 175, y: 140, width: 44, height: 44}, 
-    { keyId: 67, x: 220, y: 140, width: 44, height: 44}, 
-    { keyId: 68, x: 265, y: 140, width: 39, height: 44}, 
-    { keyId: 69, x: 305, y: 140, width: 44, height: 44}, 
-    { keyId: 70, x: 350, y: 140, width: 44, height: 44}, 
-    { keyId: 71, x: 395, y: 140, width: 44, height: 44}, 
-    { keyId: 72, x: 440, y: 140, width: 44, height: 44}, 
-    { keyId: 73, x: 485, y: 140, width: 44, height: 44}, 
-    { keyId: 74, x: 530, y: 140, width: 44, height: 44}, 
-    { keyId: 76, x: 575, y: 140, width: 99, height: 44}, // enter
+    [63, 0, 140, 84, 44], // capslock
+    [64, 85, 140, 44, 44], 
+    [65, 130, 140, 44, 44], 
+    [66, 175, 140, 44, 44], 
+    [67, 220, 140, 44, 44], 
+    [68, 265, 140, 39, 44], 
+    [69, 305, 140, 44, 44], 
+    [70, 350, 140, 44, 44], 
+    [71, 395, 140, 44, 44], 
+    [72, 440, 140, 44, 44], 
+    [73, 485, 140, 44, 44], 
+    [74, 530, 140, 44, 44], 
+    [76, 575, 140, 99, 44], // enter
 
-    { keyId: 80, x: 830, y: 140, width: 44, height: 44}, // 4
-    { keyId: 81, x: 875, y: 140, width: 44, height: 44}, // 5
-    { keyId: 82, x: 920, y: 140, width: 44, height: 44}, // 6
+    [80, 830, 140, 44, 44], // 4
+    [81, 875, 140, 44, 44], // 5
+    [82, 920, 140, 44, 44], // 6
 
-    { keyId: 84, x: 0, y: 185, width: 104, height: 44}, // shift
-    { keyId: 86, x: 105, y: 185, width: 44, height: 44},
-    { keyId: 87, x: 150, y: 185, width: 44, height: 44},
-    { keyId: 88, x: 195, y: 185, width: 44, height: 44},
-    { keyId: 89, x: 240, y: 185, width: 44, height: 44},
-    { keyId: 90, x: 285, y: 185, width: 44, height: 44},
-    { keyId: 91, x: 330, y: 185, width: 44, height: 44},
-    { keyId: 92, x: 370, y: 185, width: 39, height: 44},
-    { keyId: 93, x: 415, y: 185, width: 44, height: 44},
-    { keyId: 94, x: 460, y: 185, width: 44, height: 44},
-    { keyId: 95, x: 505, y: 185, width: 44, height: 44},
-    { keyId: 97, x: 550, y: 185, width: 124, height: 44}, // Rshift
+    [84, 0, 185, 104, 44], // shift
+    [86, 105, 185, 44, 44],
+    [87, 150, 185, 44, 44],
+    [88, 195, 185, 44, 44],
+    [89, 240, 185, 44, 44],
+    [90, 285, 185, 44, 44],
+    [91, 330, 185, 44, 44],
+    [92, 370, 185, 39, 44],
+    [93, 415, 185, 44, 44],
+    [94, 460, 185, 44, 44],
+    [95, 505, 185, 44, 44],
+    [97, 550, 185, 124, 44], // Rshift
 
-    { keyId: 99, x: 730, y: 185, width: 44, height: 44}, // up
+    [99, 730, 185, 44, 44], // up
 
-    { keyId: 101, x: 830, y: 185, width: 44, height: 44}, // 1
-    { keyId: 102, x: 875, y: 185, width: 44, height: 44}, // 2
-    { keyId: 103, x: 920, y: 185, width: 44, height: 44}, // 3
+    [101, 830, 185, 44, 44], // 1
+    [102, 875, 185, 44, 44], // 2
+    [103, 920, 185, 44, 44], // 3
 
-    { keyId: 104, x: 965, y: 185, width: 44, height: 94}, // numpdEnter
-    
-    { keyId: 105, x: 0, y: 230, width: 59, height: 50}, // ctrl
-    { keyId: 106, x: 60, y: 230, width: 59, height: 50}, // win
-    { keyId: 107, x: 120, y: 230, width: 54, height: 50}, // alt
-    { keyId: 108, x: 175, y: 230, width: 274, height: 50}, // space
-    { keyId: 109, x: 450, y: 230, width: 54, height: 50}, // ralt
-    { keyId: 110, x: 505, y: 230, width: 54, height: 50}, // fn
-    { keyId: 111, x: 560, y: 230, width: 54, height: 50}, // ?
-    { keyId: 113, x: 615, y: 230, width: 59, height: 50}, // rctrl
+    [104, 965, 185, 44, 94], // numpdEnter
 
-    { keyId: 119, x: 685, y: 230, width: 44, height: 50}, // left
-    { keyId: 120, x: 730, y: 230, width: 44, height: 50}, // down
-    { keyId: 121, x: 775, y: 230, width: 44, height: 50}, // right
+    [105, 0, 230, 59, 50], // ctrl
+    [106, 60, 230, 59, 50], // win
+    [107, 120, 230, 54, 50], // alt
+    [108, 175, 230, 274, 50], // space
+    [109, 450, 230, 54, 50], // ralt
+    [110, 505, 230, 54, 50], // fn
+    [111, 560, 230, 54, 50], // ?
+    [113, 615, 230, 59, 50], // rctrl
 
-    { keyId: 123, x: 830, y: 230, width: 90, height: 50}, // 0
-    { keyId: 124, x: 920, y: 230, width: 44, height: 50}, // del
+    [119, 685, 230, 44, 50], // left
+    [120, 730, 230, 44, 50], // down
+    [121, 775, 230, 44, 50], // right
 
+    [123, 830, 230, 90, 50], // 0
+    [124, 920, 230, 44, 50] // del
 ]
 
 let drawing = false; // if the user is currently drawing on the canvas
@@ -166,7 +165,7 @@ function toggleGuide() {
 function submitColors() { 
     ledColors.length = 0; //clear previous
 
-    keyLayout.forEach(({ keyId, x, y, width, height }) => {
+    keyLayout.forEach(([ keyId, x, y, width, height]) => {
         //get image data for the area
         const imgData = ctx.getImageData(x, y, width, height);
         const data = imgData.data;

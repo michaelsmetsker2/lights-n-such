@@ -188,7 +188,7 @@ function submitColors() {
         ledColors.push({ keyId, red: avgR, green: avgG, blue: avgB });
     });
 
-    void fetch("http://localhost:3000/api/colors", {
+    void fetch("/api/colors", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"

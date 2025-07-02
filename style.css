@@ -1,0 +1,11 @@
+#drawingCanvas {
+    outline: 2px black solid;
+    background-color: rgb(255, 255, 255);
+    cursor: crosshair;
+}
+
+#keymap {
+    position: absolute;
+    opacity: 0.5;
+    pointer-events: none;
+}

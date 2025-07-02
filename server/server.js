@@ -6,7 +6,7 @@ const net = require('net');
 const app = express();
 const LISTEN_PORT = 3000; //port to listen on
 
-const HOST = '127.0.0.1';
+const HOST = '192.168.0.101';
 const PORT = 6742;
 
 const HANDSHAKE_PACKET = Buffer.from('4f52474200000000280000000400000005000000', 'hex'); //protocol handshake packet

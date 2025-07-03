@@ -175,9 +175,7 @@ function submitColors() {
         const imgData = ctx.getImageData(x, y, width, height);
         const data = imgData.data; // r g b a r g b a etc
 
-        if (colerMode) { // get colors by frequency
-
-
+        if (!colerMode) { // get colors by frequency
             const frequencies = new Map();
 
             for (let i = 0; i < data.length; i+=4) {
@@ -189,7 +187,6 @@ function submitColors() {
                 const key = `${r},${g},${b}`;
 
                 frequencies.set(key, (frequencies.get(key) || 0) + 1);
-
             }
 
             let maxFreq = 0;

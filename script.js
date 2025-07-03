@@ -128,6 +128,8 @@ const keyLayout = [ //ledInex, x, y, width, height
     [124, 920, 230, 44, 50] // del
 ]
 
+
+let colerMode = 0 //0 for frequency 1 for average
 let drawing = false; // if the user is currently drawing on the canvas
 
 // contains each keys color and index for submitting to the backend
@@ -160,6 +162,10 @@ function toggleGuide() {
     guide.style.display = (guide.style.display === 'none') ? 'block' : 'none';
 }
 
+function setColorMode(mode) {
+    colerMode = mode;
+}
+
 // calculates each keys color and then sends the data to the backend
 function submitColors() { 
     ledColors.length = 0; //clear previous
@@ -169,23 +175,60 @@ function submitColors() {
         const imgData = ctx.getImageData(x, y, width, height);
         const data = imgData.data; // r g b a r g b a etc
 
-        let rSum = 0, gSum = 0, bSum = 0, count = 0;
+        if (colerMode) { // get colors by frequency
 
-        for (let i = 0; i < data.length; i += 4) {
 
-            rSum += data[i];
-            gSum += data[i + 1];
-            bSum += data[i + 2];
-            count++;
+            const frequencies = new Map();
+
+            for (let i = 0; i < data.length; i+=4) {
+
+                const r = data [i];
+                const g = data [i + 1];
+                const b = data [i + 2];
+
+                const key = `${r},${g},${b}`;
+
+                frequencies.set(key, (frequencies.get(key) || 0) + 1);
+
+            }
+
+            let maxFreq = 0;
+            let mostFrequentColor = null;
+
+            for (const [color, freq] of frequencies.entries()) {
+                if (freq > maxFreq) {
+                    maxFreq = freq;
+                    mostFrequentColor = color;
+                }
+            }
+
+            if (mostFrequentColor) {
+                const [red, green, blue] = mostFrequentColor.split(',').map(Number);
+                ledColors.push({ keyId, red, green, blue});
+            } else {
+                ledColors.push({ keyId, red: 0, green: 0, blue: 0});
+            }
+
+        } else { // average colors
+
+            let rSum = 0, gSum = 0, bSum = 0, count = 0;
+
+            for (let i = 0; i < data.length; i += 4) {
+
+                rSum += data[i];
+                gSum += data[i + 1];
+                bSum += data[i + 2];
+                count++;
+            }
+
+            if (count === 0) count = 1; // avoid div by zero
+
+            const avgR = Math.round(rSum / count);
+            const avgG = Math.round(gSum / count);
+            const avgB = Math.round(bSum / count);
+
+            ledColors.push({ keyId, red: avgR, green: avgG, blue: avgB });
         }
-
-        if (count === 0) count = 1; // avoid div by zero
-
-        const avgR = Math.round(rSum / count);
-        const avgG = Math.round(gSum / count);
-        const avgB = Math.round(bSum / count);
-
-        ledColors.push({ keyId, red: avgR, green: avgG, blue: avgB });
     });
 
     void fetch("/api/colors", {
